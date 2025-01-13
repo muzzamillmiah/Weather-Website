@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Card Section -->
+    <div class="card">
+        <!-- Search Section Inside Card -->
+        <div class="search">
+            <form>
+                <input type="text" placeholder="Enter City Name" spellcheck="false">
+                <button type="submit">
+                    <img src="images/search.png" alt="Search Icon">
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="error" style="display: none;">
+        <p> Invalid City Name</p>
+    </div>
+        
+    <!-- Weather Info Section -->
+    <div class="weather" style="display: none;">
+        <img src="images/rain.png" class="weather-icon" alt="Weather Icon">
+        <h1 class="temp">6°C</h1>
+        <h2 class="city">Leicester</h2>
+    </div>
+
+    <!-- Details Section -->
+    <div class="details">
+        <div class="col">
+            <img src="images/humidity.png" alt="Humidity Icon">
+            <div>
+                <p class="humidity">50%</p>
+                <p>Humidity</p>
+            </div>
+        </div>
+        <div class="col">
+            <img src="images/wind.png" alt="Wind Icon">
+            <div>
+                <p class="wind">15 km/h</p>
+                <p>Wind Speed</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "833a0478dd902dfcb10e5bd05dab5aca";
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
+
+        async function checkWeather(city){
+            const response = await fetch(`${apiUrl}${city}&appid=${apiKey}`);
+
+            if (response.status === 404) {
+                document.querySelector(".error").style.display = "block";
+                document.querySelector(".weather").style.display = "none";
+            } else {
+                const data = await response.json();
+
+                document.querySelector(".error").style.display = "none";
+                document.querySelector(".weather").style.display = "block";
+                document.querySelector(".city").innerHTML = data.name;
+                document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+                document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+                document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+                if (data.weather[0].main === "Clouds") {
+                    weatherIcon.src = "images/cloudy.png";
+                } else if (data.weather[0].main === "Rain") {
+                    weatherIcon.src = "images/rain.png";
+                } else if (data.weather[0].main === "Drizzle") {
+                    weatherIcon.src = "images/drizzle.png";
+                } else if (data.weather[0].main === "Mist") {
+                    weatherIcon.src = "images/mist.png";
+                }
+
+                document.querySelector(".error").style.display = "block";
+                document.querySelector(".weather").style.display = "none";
+            }
+        }
+
+        searchBtn.addEventListener("click", (event) => {
+            event.preventDefault();  // Prevent page reload
+            checkWeather(searchBox.value);
+        });
+
+        // You can call checkWeather with a default city if desired
+        // checkWeather("Leicester");
+    </script>
+
+    <!-- Live Reload Script (Only if necessary for development) -->
+    <script src="live-reload.js"></script>
+</body>
+</html>
